@@ -1,0 +1,63 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install pyperclip pyinstaller
+
+      - name: Patch version into app.py
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}" -replace '^v', ''
+          (Get-Content app.py) -replace 'APP_VERSION = ".*?"', "APP_VERSION = `"$tag`"" | Set-Content app.py
+          Write-Host "Version patched to $tag"
+
+      - name: Build EXE
+        run: python -m PyInstaller --onefile --noconsole --name "PLS-DONATE-Tracker" app.py
+
+      - name: Install NSIS
+        run: choco install nsis --no-progress -y
+
+      - name: Patch version into installer.nsi and build
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}" -replace '^v', ''
+          (Get-Content installer.nsi) -replace '!define APP_VERSION\s+".*?"', "!define APP_VERSION  `"$tag`"" | Set-Content installer.nsi
+          & "C:\Program Files (x86)\NSIS\makensis.exe" installer.nsi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "PLS DONATE Tracker ${{ github.ref_name }}"
+          body: |
+            ## PLS DONATE Tracker ${{ github.ref_name }}
+
+            ### First time installing?
+            Download **PLS-DONATE-Tracker-Setup-*.exe** and run it.
+
+            ### Already have the app?
+            Just open it — you'll see a yellow update banner at the top. Click it and it updates itself automatically!
+
+            > ⚠️ If Windows shows a SmartScreen warning, click **"More info"** then **"Run anyway"** — this is normal for new apps.
+          files: |
+            dist/PLS-DONATE-Tracker.exe
+            PLS-DONATE-Tracker-Setup-v${{ github.ref_name }}.exe
