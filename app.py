@@ -22,8 +22,8 @@ APP_VERSION = "1.0.0"
 # Point these at YOUR GitHub repo (owner/repo).
 # The updater checks the latest GitHub Release for a newer version tag
 # and downloads the new EXE from the release assets automatically.
-GITHUB_REPO   = "DevYama/pls-donate-tracker"   # ← change this
-UPDATE_ASSET  = "PLS-DONATE-Tracker.exe"              # asset name in the release
+GITHUB_REPO   = "YOUR_USERNAME/pls-donate-tracker"   # ← change this
+UPDATE_ASSET  = "PD-Live-Chat-Tracker.exe"              # asset name in the release
 
 def _check_for_updates(on_update_found):
     """Run in a background thread. Calls on_update_found(latest_ver, download_url) if newer."""
@@ -705,7 +705,7 @@ def _initials(name):
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title('PLS DONATE Tracker')
+        self.root.title('PD Live Chat Tracker')
         self.root.geometry('420x720')
         self.root.minsize(320, 200)
         self.root.configure(bg=BG)
@@ -2388,6 +2388,15 @@ class App:
 def main():
     threading.Thread(target=run_server, daemon=True).start()
     root = tk.Tk()
+    # Set window icon
+    try:
+        import os, sys
+        base = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(base, 'icon.ico')
+        if os.path.exists(icon_path):
+            root.iconbitmap(icon_path)
+    except Exception:
+        pass
     app = App(root)
     threading.Thread(target=_validation_worker, args=(app,), daemon=True).start()
     root.after(200, lambda: app.set_always_on_top(True))

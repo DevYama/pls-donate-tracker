@@ -32,7 +32,7 @@ jobs:
           Write-Host "Version patched to $tag"
 
       - name: Build EXE
-        run: python -m PyInstaller --onefile --noconsole --name "PLS-DONATE-Tracker" app.py
+        run: python -m PyInstaller --onefile --noconsole --add-data "icon.ico;." --icon "icon.ico" --name "PD-Live-Chat-Tracker" app.py
 
       - name: Install NSIS
         run: choco install nsis --no-progress -y
@@ -47,17 +47,17 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "PLS DONATE Tracker ${{ github.ref_name }}"
+          name: "PD Live Chat Tracker ${{ github.ref_name }}"
           body: |
-            ## PLS DONATE Tracker ${{ github.ref_name }}
+            ## PD Live Chat Tracker ${{ github.ref_name }}
 
             ### First time installing?
-            Download **PLS-DONATE-Tracker-Setup-*.exe** and run it.
+            Download **PD-Live-Chat-Tracker-Setup-*.exe** and run it.
 
             ### Already have the app?
-            Just open it — you'll see a yellow update banner at the top. Click it and it updates itself automatically!
+            Just open it — you will see a yellow update banner at the top. Click it and it updates itself automatically!
 
-            > ⚠️ If Windows shows a SmartScreen warning, click **"More info"** then **"Run anyway"** — this is normal for new apps.
+            > If Windows shows a SmartScreen warning, click **More info** then **Run anyway** — this is normal for new apps.
           files: |
-            dist/PLS-DONATE-Tracker.exe
-            PLS-DONATE-Tracker-Setup-v${{ github.ref_name }}.exe
+            dist/PD-Live-Chat-Tracker.exe
+            PD-Live-Chat-Tracker-Setup-v${{ github.ref_name }}.exe
